@@ -1,0 +1,6 @@
+'use client';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+const links = [['Robotics', '/robotics'], ['AI Infrastructure', '/liquid-cooling'], ['Industries', '/industries'], ['RaaS', '/raas'], ['Company', '/company']];
+export function Navigation() { const [open, setOpen] = useState(false); const pathname = usePathname(); return <header className="header"><div className="nav container"><Link href="/" className="brand" aria-label="AERVYNT AI home"><span className="brand-mark" aria-hidden="true">Λ</span>AERVYNT<span className="brand-ai">AI</span></Link><button className="menu-toggle" aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(!open)}>{open ? 'Close' : 'Menu'}<span aria-hidden="true">{open ? '−' : '+'}</span></button><nav id="main-navigation" aria-label="Main navigation" className={open ? 'nav-links open' : 'nav-links'}>{links.map(([label, href]) => <Link key={href} href={href} aria-current={pathname === href ? 'page' : undefined} onClick={() => setOpen(false)}>{label}</Link>)}<Link href="/contact" className="nav-contact" onClick={() => setOpen(false)}>Let’s talk <span aria-hidden="true">↗</span></Link></nav></div></header>; }
