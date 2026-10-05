@@ -51,3 +51,19 @@ Public-launch checklist: verify legal/company copy, privacy details, receiver pe
 
 The infrastructure and humanoid graphics are original CSS illustrations, labelled as conceptual architecture. Technology Partners is an invitation and capability map; add verified relationships only after written authorization. No performance guarantees, invented clients, office locations or prices are published.
 
+
+## Direct HubSpot form integration
+
+A direct Forms API adapter is available without Make/n8n. The connected portal contains the published form **AERVYNT — Contact & Assessment Request** (portal `247218560`, form GUID `658e0c50-acd7-42d2-b0dd-52917cd88852`). Connector CRM access does not provide a website runtime credential or form-editor settings.
+
+To activate:
+
+1. Open the existing form in HubSpot and verify its internal property names. It must include email, a full-name field, company and a multiline enquiry field. All submitted properties must belong to the published form; fill any other required fields or remove their requirement before activating this integration.
+2. Set `HUBSPOT_FIELD_MAP` to a JSON object with keys `email`, `name`, `company`, `enquiry`, each mapped to its verified internal property name. Do not use UI labels. Field names are intentionally not guessed and no live mapping is enabled in this PR.
+3. Set `LEAD_PROVIDER=hubspot`, `HUBSPOT_PORTAL_ID`, `HUBSPOT_FORM_ID` and the exact `NEXT_PUBLIC_SITE_URL` on the host; rebuild/redeploy the reviewed branch. The webhook credentials are not used in this mode. Missing/invalid mappings return 503 and failed HubSpot submissions return 502, with no automatic fallback or fabricated success.
+4. Enable form submission notifications for the active HubSpot user with address `vshnypko@aervynt.ai`. The connected user's email is different; a user search did not find this notification address. This recipient must be an active HubSpot user with email notifications enabled. User invitations/account-email changes are not performed by the code.
+5. Submit a controlled test after activation and verify both the HubSpot form submission and actual email receipt. No test lead or email has been sent to the live portal by the repository tests.
+
+The detailed enquiry includes intent, commercial model, region, industry, category and message, so repeated enquiries remain separate form submissions. It sends explicit processing consent and **no marketing subscription consent**. The adapter does not install HubSpot tracking scripts, read visitor cookies or infer names. Native HubSpot submission notifications handle email separately: an accepted API submission alone is not proof of email delivery.
+
+Keep integration disabled until form fields, required fields, privacy configuration, notifications and host settings are verified. Existing provider-level rate limiting requirements still apply. Tests use a stub transport and fixture property names, never the live CRM.
