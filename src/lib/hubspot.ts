@@ -12,9 +12,10 @@ const configSchema = z.object({
   formId: z.uuid(),
   siteUrl: z.url(),
   // Internal property names must be verified against the published form.
-  fields: z.object({ email: fieldName, name: fieldName, company: fieldName, enquiry: fieldName }),
+  fields: z.object({ email: fieldName, name: fieldName.optional(), company: fieldName.optional(), enquiry: fieldName }),
 }).superRefine((config, context) => {
-  if (new Set(Object.values(config.fields)).size !== 4) {
+  const configured = Object.values(config.fields).filter(Boolean);
+  if (new Set(configured).size !== configured.length) {
     context.addIssue({ code: 'custom', message: 'HubSpot field mappings must be distinct.' });
   }
 });
@@ -31,6 +32,7 @@ export function readHubSpotConfig(env: Record<string, string | undefined>): HubS
 
 export function buildHubSpotSubmission(lead: Enquiry, config: HubSpotConfig) {
   const enquiry = [
+    `Name: ${lead.name}`, `Company: ${lead.company}`,
     `Enquiry: ${lead.intent}`, `Commercial model: ${lead.model}`,
     `Country / region: ${lead.region}`, `Industry: ${lead.industry}`,
     `Area of interest: ${lead.category}`, '', lead.message,
@@ -38,8 +40,8 @@ export function buildHubSpotSubmission(lead: Enquiry, config: HubSpotConfig) {
   return {
     fields: [
       { objectTypeId: '0-1', name: config.fields.email, value: lead.email },
-      { objectTypeId: '0-1', name: config.fields.name, value: lead.name },
-      { objectTypeId: '0-1', name: config.fields.company, value: lead.company },
+      ...(config.fields.name ? [{ objectTypeId: '0-1', name: config.fields.name, value: lead.name }] : []),
+      ...(config.fields.company ? [{ objectTypeId: '0-1', name: config.fields.company, value: lead.company }] : []),
       { objectTypeId: '0-1', name: config.fields.enquiry, value: enquiry },
     ],
     context: { pageUri: new URL('/contact', config.siteUrl).href, pageName: 'AERVYNT AI enquiry' },

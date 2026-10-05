@@ -17,7 +17,7 @@ test('HubSpot mapping preserves all enquiry context without marketing consent', 
   const payload = buildHubSpotSubmission(lead, config);
   expect(payload.fields.find(f => f.name === 'test_full_name')?.value).toBe(lead.name);
   const text = payload.fields.find(f => f.name === 'test_enquiry')?.value;
-  for (const value of [lead.region, lead.intent, lead.model, lead.industry, lead.category, lead.message]) expect(text).toContain(value);
+  for (const value of [lead.name, lead.company, lead.region, lead.intent, lead.model, lead.industry, lead.category, lead.message]) expect(text).toContain(value);
   expect(payload.legalConsentOptions.consent.communications).toEqual([]);
   expect(payload.legalConsentOptions.consent.consentToProcess).toBe(true);
 });
@@ -40,4 +40,11 @@ test('HubSpot delivery acknowledges only an accepted submission', async () => {
 test('HubSpot refuses unverified or duplicate field mappings', () => {
   expect(() => readHubSpotConfig({ HUBSPOT_PORTAL_ID: config.portalId, HUBSPOT_FORM_ID: config.formId })).toThrow();
   expect(() => readHubSpotConfig({ HUBSPOT_PORTAL_ID: config.portalId, HUBSPOT_FORM_ID: config.formId, HUBSPOT_FIELD_MAP: JSON.stringify({ ...config.fields, company: 'email' }) })).toThrow();
+});
+
+test('existing AERVYNT form uses only verified email and message fields', () => {
+  const payload = buildHubSpotSubmission(lead, { ...config, fields: { email: 'email', enquiry: 'message' } });
+  expect(payload.fields.map(f => f.name)).toEqual(['email', 'message']);
+  expect(payload.fields[1].value).toContain(`Name: ${lead.name}`);
+  expect(payload.fields[1].value).toContain(`Company: ${lead.company}`);
 });
