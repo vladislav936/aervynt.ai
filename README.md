@@ -68,3 +68,15 @@ The detailed enquiry includes intent, commercial model, region, industry, catego
 
 The form fields have been verified; notifications, privacy configuration, host settings and live reception must still be verified before public activation. Existing provider-level rate limiting requirements still apply. Tests use a stub transport and fixture property names, never the live CRM.
 
+
+## Cloudflare Workers preview
+
+The repository's new Next.js website is separate from the earlier static-only Worker `aervyntai`. Use the feature branch for the preview Worker `aervyntai-preview`; do not connect the static production Worker to a build of `main` (main currently contains only the initialization README).
+
+The OpenNext adapter builds a server-backed Worker with `/api/leads`. Run `pnpm build:cloudflare` then `pnpm preview:cloudflare` to verify it in the Workers runtime. `pnpm deploy:cloudflare` deploys the built output to the preview Worker named in `wrangler.jsonc`.
+
+For Cloudflare Git builds select `feat/aervynt-production-website`, repository root, build command `pnpm build:cloudflare`, deploy command `pnpm deploy:cloudflare`, and set the build variable `NEXT_PUBLIC_SITE_URL=https://aervyntai-preview.vshnypko.workers.dev`. The runtime configuration includes the verified non-secret HubSpot portal/form identifiers and property mapping. No CRM access token is needed for this Forms endpoint. Verify receipt from this preview before production promotion.
+
+HubSpot notification setup was completed on 2026-10-05: `vladislav@aervynt.ai` is active and selected in the published form. A controlled hosted-form submission was recorded in HubSpot and the user confirmed actual email receipt. This verifies HubSpot notifications; it does not yet verify the new website's deployed `/api/leads` route.
+
+Before switching to production, review the preview, configure the legal/privacy details, provider rate limits, and exact production origin at build and runtime. Change Worker name and self-reference together only for a reviewed production deployment. Existing `aervyntai` custom domains remain attached to the earlier static site until a deliberate production update.

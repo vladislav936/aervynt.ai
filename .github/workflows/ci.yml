@@ -23,3 +23,12 @@ jobs:
       - run: pnpm test:e2e
         env:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      - run: pnpm build:cloudflare
+        env:
+          NEXT_PUBLIC_SITE_URL: https://aervyntai-preview.vshnypko.workers.dev
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-worker-preview
+          path: .open-next/
+          include-hidden-files: true
+          retention-days: 7
