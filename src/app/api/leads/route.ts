@@ -1,10 +1,20 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { categories, industries } from '@/lib/content';
 import { deliverToHubSpot, readHubSpotConfig } from '@/lib/hubspot';
 const schema = z.object({ intent: z.enum(['audit', 'demo', 'quote', 'partner', 'general']), model: z.enum(['Undecided', 'Buy', 'Lease', 'Rent', 'RaaS']), name: z.string().trim().min(1).max(100), email: z.email().max(254), company: z.string().trim().min(1).max(150), region: z.string().trim().min(1).max(100), industry: z.enum([...industries.map(([name]) => name), 'Other']), category: z.enum([...categories.map(c => c.slug), 'ai-infrastructure', 'autonomous-operations', 'other']), message: z.string().trim().min(20).max(5000), consent: z.literal(true), website: z.string().max(500).optional() });
 export async function POST(request: Request) { const origin = request.headers.get('origin'); const allowed = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://aervynt.ai').origin; const allowedOrigins = allowed === 'https://aervynt.ai' ? [allowed, 'https://www.aervynt.ai'] : [allowed]; if (!origin || !allowedOrigins.includes(origin))
-    return NextResponse.json({ error: 'This request origin is not permitted.' }, { status: 403 }); if (!request.headers.get('content-type')?.includes('application/json'))
+    return NextResponse.json({ error: 'This request origin is not permitted.' }, { status: 403 }); if (process.env.LEAD_RATE_LIMIT_ENABLED === 'true') {
+    try {
+        const env = getCloudflareContext().env as unknown as { LEAD_RATE_LIMITER?: { limit(input: { key: string }): Promise<{ success: boolean }> } };
+        if (!env.LEAD_RATE_LIMITER) throw new Error('Missing rate limiter');
+        const { success } = await env.LEAD_RATE_LIMITER.limit({ key: request.headers.get('cf-connecting-ip') || 'unknown' });
+        if (!success) return NextResponse.json({ error: 'Too many enquiries. Please wait one minute and try again.' }, { status: 429, headers: { 'Retry-After': '60' } });
+    } catch {
+        return NextResponse.json({ error: 'The contact service is temporarily unavailable. Please retry shortly.' }, { status: 503 });
+    }
+} if (!request.headers.get('content-type')?.includes('application/json'))
     return NextResponse.json({ error: 'JSON is required.' }, { status: 415 }); let raw: string; try {
     raw = await request.text();
 }

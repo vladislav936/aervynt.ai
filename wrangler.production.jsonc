@@ -25,6 +25,17 @@
     "LEAD_PROVIDER": "hubspot",
     "HUBSPOT_PORTAL_ID": "247218560",
     "HUBSPOT_FORM_ID": "658e0c50-acd7-42d2-b0dd-52917cd88852",
-    "HUBSPOT_FIELD_MAP": "{\"email\":\"email\",\"enquiry\":\"message\"}"
-  }
+    "HUBSPOT_FIELD_MAP": "{\"email\":\"email\",\"enquiry\":\"message\"}",
+    "LEAD_RATE_LIMIT_ENABLED": "true"
+  },
+  "ratelimits": [
+    {
+      "name": "LEAD_RATE_LIMITER",
+      "namespace_id": "247218560",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ]
 }

@@ -34,7 +34,7 @@ Production is `pnpm build` followed by `pnpm start`. Playwright runs against the
 
 `POST /api/leads` validates enumerated interests, lengths, email and explicit consent with Zod. It enforces the configured origin, rejects oversized JSON, uses a hidden spam field and never logs enquiry contents. The server forwards validated fields plus `source` and `submittedAt` as JSON to the configured HTTPS webhook with `Authorization: Bearer <token>`. A non-2xx response, redirect or timeout returns an error; the UI never claims delivery without receiver acknowledgement. The receiver must durably store an enquiry before returning 2xx, deduplicate retries, control access, set retention and implement rate limiting/abuse detection. Add deployment-provider rate limiting on `/api/leads` before enabling public enquiries; do not rely on in-memory counters across serverless instances.
 
-Without both webhook values the endpoint returns 503 and the form displays an honest unavailable message. Configure a CRM integration or your own durable enquiry receiver; this project does not send email or register marketing subscriptions. Confirm the legal operating entity, direct privacy contact, retention period and processors in `src/app/privacy/page.tsx` before enabling collection. Those business details were not supplied and are not invented.
+Without both webhook values the endpoint returns 503 and the form displays an honest unavailable message. Configure a CRM integration or your own durable enquiry receiver; this project does not send email or register marketing subscriptions. Confirm the legal operating entity, direct privacy contact, retention period and processors in `src/app/privacy/page.tsx` before enabling collection. The owner confirmed Litehouse Alfa General Trading LLC, Dubai, UAE and vladislav@aervynt.ai; the privacy notice identifies Cloudflare and HubSpot.
 
 Public-launch checklist: verify legal/company copy, privacy details, receiver persistence and rate limits; confirm any product specifications and territory rights; test demo/quote/audit/partner enquiries; review mobile keyboard navigation; configure exact canonical origin and HTTPS. Capability pages are catalog foundations, not inventory, certification or partner claims.
 
@@ -66,7 +66,7 @@ To activate:
 
 The detailed enquiry includes intent, commercial model, region, industry, category and message, so repeated enquiries remain separate form submissions. It sends explicit processing consent and **no marketing subscription consent**. The adapter does not install HubSpot tracking scripts, read visitor cookies or infer names. Native HubSpot submission notifications handle email separately: an accepted API submission alone is not proof of email delivery.
 
-The form fields have been verified; notifications, privacy configuration, host settings and live reception must still be verified before public activation. Existing provider-level rate limiting requirements still apply. Tests use a stub transport and fixture property names, never the live CRM.
+Form fields, notification recipient, legal operator and live preview delivery have been verified. The owner confirmed receipt of the preview email. Existing provider-level rate limiting requirements still apply. Tests use a stub transport and fixture property names, never the live CRM.
 
 
 ## Cloudflare Workers preview
@@ -80,17 +80,10 @@ For Cloudflare Git builds select `feat/aervynt-production-website`, repository r
 HubSpot notification setup was completed on 2026-10-05: `vladislav@aervynt.ai` is active and selected in the published form. A controlled hosted-form submission was recorded in HubSpot and the user confirmed actual email receipt. This verifies HubSpot notifications; it does not yet verify the new website's deployed `/api/leads` route.
 
 Before switching to production, review the preview, configure the legal/privacy details, provider rate limits, and exact production origin at build and runtime. Change Worker name and self-reference together only for a reviewed production deployment. Existing `aervyntai` custom domains remain attached to the earlier static site until a deliberate production update.
-## Production deployment on Cloudflare
+## Production deployment
 
-The verified preview remains on `aervyntai-preview` with the default `wrangler.jsonc`.
-Production uses the existing `aervyntai` Worker and `wrangler.production.jsonc`.
-
-Cloudflare Workers Builds (production): repository `vladislav936/aervynt.ai`, branch `main`, root `/`, build command `pnpm build:production`, deploy command `pnpm deploy:production`.
-Set the build variable `NEXT_PUBLIC_SITE_URL=https://aervynt.ai` for canonical URLs.
-Production runtime configuration supplies the same origin, verified HubSpot form mapping and self-reference to `aervyntai`. Both https://aervynt.ai and https://www.aervynt.ai can submit enquiries; other origins are rejected.
-
-Before merging, require lint, typecheck, browser tests, Next.js build and OpenNext build to pass. After deployment, verify both custom domains, contact intent links and a controlled live form submission. HubSpot notifications go to the configured recipient `vladislav@aervynt.ai`; preview submission and email delivery were confirmed by the owner.
-
-Rollback: Cloudflare > aervyntai > Deployments > previous deployment > Roll back. The existing static production version before this migration is `8423261b` (short version identifier). Keep it available until production smoke checks pass.
-
-Privacy operator and contact were confirmed by the owner: Litehouse Alfa General Trading LLC, Dubai, UAE; vladislav@aervynt.ai.
+Keep preview on default `wrangler.jsonc`; production uses `wrangler.production.jsonc` and existing Worker `aervyntai`.
+Cloudflare Builds: branch `main`, root `/`, build `pnpm build:production`, deploy `pnpm deploy:production`; build variable `NEXT_PUBLIC_SITE_URL=https://aervynt.ai`.
+Production runtime supplies verified HubSpot configuration, both root/www accepted origins and a Cloudflare rate limiter (5 requests per IP per minute per location, namespace 247218560). This is best-effort abuse protection, not an exact global quota. Missing limiter fails closed. Other platforms should supply their own protection and leave `LEAD_RATE_LIMIT_ENABLED` unset.
+Require CI and preview checks before merging. Verify root/www and one controlled form submission after deployment.
+Rollback: Cloudflare > aervyntai > Deployments > previous version > Roll back. Previous static version: `8423261b` (short ID).
