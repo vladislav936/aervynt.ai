@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { categories, industries } from '@/lib/content';
 import { deliverToHubSpot, readHubSpotConfig } from '@/lib/hubspot';
 const schema = z.object({ intent: z.enum(['audit', 'demo', 'quote', 'partner', 'general']), model: z.enum(['Undecided', 'Buy', 'Lease', 'Rent', 'RaaS']), name: z.string().trim().min(1).max(100), email: z.email().max(254), company: z.string().trim().min(1).max(150), region: z.string().trim().min(1).max(100), industry: z.enum([...industries.map(([name]) => name), 'Other']), category: z.enum([...categories.map(c => c.slug), 'ai-infrastructure', 'autonomous-operations', 'other']), message: z.string().trim().min(20).max(5000), consent: z.literal(true), website: z.string().max(500).optional() });
-export async function POST(request: Request) { const origin = request.headers.get('origin'); const allowed = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://aervynt.ai').origin; if (origin !== allowed)
+export async function POST(request: Request) { const origin = request.headers.get('origin'); const allowed = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://aervynt.ai').origin; const allowedOrigins = allowed === 'https://aervynt.ai' ? [allowed, 'https://www.aervynt.ai'] : [allowed]; if (!origin || !allowedOrigins.includes(origin))
     return NextResponse.json({ error: 'This request origin is not permitted.' }, { status: 403 }); if (!request.headers.get('content-type')?.includes('application/json'))
     return NextResponse.json({ error: 'JSON is required.' }, { status: 415 }); let raw: string; try {
     raw = await request.text();

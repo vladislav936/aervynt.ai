@@ -11,7 +11,9 @@
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
     "build:cloudflare": "opennextjs-cloudflare build",
     "preview:cloudflare": "opennextjs-cloudflare preview",
-    "deploy:cloudflare": "opennextjs-cloudflare deploy"
+    "deploy:cloudflare": "opennextjs-cloudflare deploy",
+    "build:production": "opennextjs-cloudflare build --config wrangler.production.jsonc",
+    "deploy:production": "opennextjs-cloudflare deploy --config wrangler.production.jsonc"
   },
   "engines": {
     "node": ">=22"

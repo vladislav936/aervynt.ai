@@ -80,3 +80,17 @@ For Cloudflare Git builds select `feat/aervynt-production-website`, repository r
 HubSpot notification setup was completed on 2026-10-05: `vladislav@aervynt.ai` is active and selected in the published form. A controlled hosted-form submission was recorded in HubSpot and the user confirmed actual email receipt. This verifies HubSpot notifications; it does not yet verify the new website's deployed `/api/leads` route.
 
 Before switching to production, review the preview, configure the legal/privacy details, provider rate limits, and exact production origin at build and runtime. Change Worker name and self-reference together only for a reviewed production deployment. Existing `aervyntai` custom domains remain attached to the earlier static site until a deliberate production update.
+## Production deployment on Cloudflare
+
+The verified preview remains on `aervyntai-preview` with the default `wrangler.jsonc`.
+Production uses the existing `aervyntai` Worker and `wrangler.production.jsonc`.
+
+Cloudflare Workers Builds (production): repository `vladislav936/aervynt.ai`, branch `main`, root `/`, build command `pnpm build:production`, deploy command `pnpm deploy:production`.
+Set the build variable `NEXT_PUBLIC_SITE_URL=https://aervynt.ai` for canonical URLs.
+Production runtime configuration supplies the same origin, verified HubSpot form mapping and self-reference to `aervyntai`. Both https://aervynt.ai and https://www.aervynt.ai can submit enquiries; other origins are rejected.
+
+Before merging, require lint, typecheck, browser tests, Next.js build and OpenNext build to pass. After deployment, verify both custom domains, contact intent links and a controlled live form submission. HubSpot notifications go to the configured recipient `vladislav@aervynt.ai`; preview submission and email delivery were confirmed by the owner.
+
+Rollback: Cloudflare > aervyntai > Deployments > previous deployment > Roll back. The existing static production version before this migration is `8423261b` (short version identifier). Keep it available until production smoke checks pass.
+
+Privacy operator and contact were confirmed by the owner: Litehouse Alfa General Trading LLC, Dubai, UAE; vladislav@aervynt.ai.
