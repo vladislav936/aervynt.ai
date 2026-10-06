@@ -1,0 +1,5 @@
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import { LeadForm } from '@/components/lead-form';
+export const metadata: Metadata = { title: 'Contact & Robotics Audit', description: 'Start a Robotics Audit, book a demo, request a quote or discuss technology collaboration with AERVYNT AI.', alternates: { canonical: '/contact' } };
+export default function Contact() { return <section className="container contact-layout section"><div><p className="eyebrow">LET’S BUILD YOUR NEXT OPERATION</p><h1>Start a<br />conversation.</h1><p className="hero-description">Share your requirements. We’ll use them to scope the right technical and commercial discussion.</p><div className="contact-note"><h2>What a Robotics Audit covers</h2><ul><li>Workflow and operating baseline</li><li>Site readiness and safety constraints</li><li>Technology fit and integration needs</li><li>Pilot objectives and commercial options</li></ul><p>Initial discovery is followed by a separately agreed scope. Demo and equipment availability are confirmed during qualification.</p></div></div><Suspense fallback={<p>Loading enquiry form…</p>}><LeadForm /></Suspense></section>; }
