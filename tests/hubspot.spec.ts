@@ -27,7 +27,7 @@ test('HubSpot delivery acknowledges only an accepted submission', async () => {
   let body = '';
   const accepted: typeof fetch = async (url, options) => {
     destination = String(url); body = String(options?.body);
-    expect(options?.redirect).toBe('error');
+    expect(options?.redirect).toBe('manual');
     return new Response('{}', { status: 200 });
   };
   await deliverToHubSpot(lead, config, accepted);

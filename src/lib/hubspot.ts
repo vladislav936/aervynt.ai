@@ -61,7 +61,7 @@ export async function deliverToHubSpot(lead: Enquiry, config: HubSpotConfig, tra
     {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildHubSpotSubmission(lead, verified)),
-      signal: AbortSignal.timeout(10000), redirect: 'error',
+      signal: AbortSignal.timeout(10000), redirect: 'manual',
     },
   );
   if (!response.ok) {

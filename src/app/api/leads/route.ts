@@ -27,7 +27,7 @@ if (process.env.LEAD_PROVIDER === 'hubspot') {
         await deliverToHubSpot(result.data, config);
         return NextResponse.json({ ok: true });
     } catch (error) {
-        console.error('HubSpot transport failure', error instanceof Error ? `${error.name}: ${error.message.slice(0, 200)}` : 'UnknownError');
+        console.error('HubSpot transport failure', error instanceof Error ? error.name : 'UnknownError');
         return NextResponse.json({ error: 'Your enquiry could not be delivered. Please retry shortly.' }, { status: 502 });
     }
 }
@@ -41,7 +41,7 @@ catch {
 } try {
     const { website: _website, ...lead } = result.data;
     void _website;
-    const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ source: 'aervynt.ai', submittedAt: new Date().toISOString(), ...lead }), signal: AbortSignal.timeout(10000), redirect: 'error' });
+    const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ source: 'aervynt.ai', submittedAt: new Date().toISOString(), ...lead }), signal: AbortSignal.timeout(10000), redirect: 'manual' });
     if (!response.ok)
         throw new Error('delivery failed');
     return NextResponse.json({ ok: true });
