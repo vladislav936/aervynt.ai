@@ -64,5 +64,8 @@ export async function deliverToHubSpot(lead: Enquiry, config: HubSpotConfig, tra
       signal: AbortSignal.timeout(10000), redirect: 'error',
     },
   );
-  if (!response.ok) throw new Error('HubSpot did not accept the enquiry.');
+  if (!response.ok) {
+    console.error('HubSpot delivery status', response.status);
+    throw new Error('HubSpot did not accept the enquiry.');
+  }
 }

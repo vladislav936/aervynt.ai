@@ -26,7 +26,8 @@ if (process.env.LEAD_PROVIDER === 'hubspot') {
     try {
         await deliverToHubSpot(result.data, config);
         return NextResponse.json({ ok: true });
-    } catch {
+    } catch (error) {
+        console.error('HubSpot transport failure', error instanceof Error ? error.name : 'UnknownError');
         return NextResponse.json({ error: 'Your enquiry could not be delivered. Please retry shortly.' }, { status: 502 });
     }
 }
